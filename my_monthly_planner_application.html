@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Monthly Planner - Aesthetic Habit Tracker & Planner</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            lavender: '#E9E4F0',
+                            lavenderDeep: '#7E57C2',
+                            pink: '#FDE2E4',
+                            pinkDeep: '#E8A598',
+                            blue: '#E2ECE9',
+                            blueDeep: '#6C91C2',
+                            mint: '#D8F3DC',
+                            mintDeep: '#52B788',
+                            peach: '#FFE5D9',
+                            peachDeep: '#F4A261',
+                            cream: '#FFF1E6',
+                            purpleBg: '#FAF7FD'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF9FE; color: #334155; }
+        
+        /* Custom Soft Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 30px -5px rgba(126, 87, 194, 0.05);
+        }
+        
+        .glass-card-sm {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(241, 245, 249, 0.8);
+            box-shadow: 0 4px 15px -2px rgba(148, 163, 184, 0.06);
+        }
+
+        /* Aesthetic Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        /* Custom Soft Checkbox */
+        .checkbox-habit {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #CBD5E1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            outline: none;
+            background-color: #FFFFFF;
+        }
+        .checkbox-habit:checked {
+            background-color: #7E57C2;
+            border-color: #7E57C2;
+            box-shadow: 0 2px 8px rgba(126, 87, 194, 0.3);
+        }
+        .checkbox-habit:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .checkbox-habit:hover {
+            border-color: #7E57C2;
+            transform: scale(1.05);
+        }
+
+        .nav-link.active {
+            background-color: #F3E8FF;
+            color: #7E57C2;
+            font-weight: 700;
+        }
+
+        /* Pulse glowing effects */
+        .glow-lavender { box-shadow: 0 0 20px rgba(126, 87, 194, 0.15); }
+    </style>
+</head>
+<body class="h-full flex flex-col md:flex-row overflow-x-hidden text-slate-700">
+
+    <!-- Sleek Aesthetic Sidebar -->
+    <aside class="w-full md:w-72 bg-white/90 border-r border-slate-100 flex-shrink-0 flex flex-col justify-between z-20">
+        <div>
+            <!-- Brand Logo Header -->
+            <div class="p-6 border-b border-slate-100/80 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-purple-500 to-pink-400 flex items-center justify-center text-white text-xl shadow-lg shadow-purple-500/20">
+                        <i class="fa-solid fa-sparkles"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-slate-800 text-lg tracking-tight font-serif">My Planner</h1>
+                        <p class="text-[11px] font-medium text-purple-600/80 uppercase tracking-widest">Habit Studio</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation Links -->
+            <nav class="p-4 space-y-1.5" id="sidebar-nav">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active w-full flex items-center gap-3.5 px-4 py-3 text-slate-600 rounded-xl transition-all duration-200 text-xs font-semibold hover:bg-slate-50">
+                    <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    Dashboard
+                </button>
+                <button onclick="switchTab('tracker')" id="nav-tracker" class="nav-link w-full flex items-center gap-3.5 px-4 py-3 text-slate-600 rounded-xl transition-all duration-200 text-xs font-semibold hover:bg-slate-50">
+                    <div class="w-7 h-7 rounded-lg bg-pink-100 text-pink-500 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-table-cells"></i>
+                    </div>
+                    Monthly Habit Grid
+                </button>
+                <button onclick="switchTab('daily')" id="nav-daily" class="nav-link w-full flex items-center gap-3.5 px-4 py-3 text-slate-600 rounded-xl transition-all duration-200 text-xs font-semibold hover:bg-slate-50">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    Daily Task View
+                </button>
+                <button onclick="switchTab('categories')" id="nav-categories" class="nav-link w-full flex items-center gap-3.5 px-4 py-3 text-slate-600 rounded-xl transition-all duration-200 text-xs font-semibold hover:bg-slate-50">
+                    <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    Categories & Habits
+                </button>
+                <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-link w-full flex items-center gap-3.5 px-4 py-3 text-slate-600 rounded-xl transition-all duration-200 text-xs font-semibold hover:bg-slate-50">
+                    <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    Progress Analytics
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="nav-link w-full flex items-center gap-3.5 px-4 py-3 text-slate-600 rounded-xl transition-all duration-200 text-xs font-semibold hover:bg-slate-50">
+                    <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    Settings & Backup
+                </button>
+            </nav>
+        </div>
+
+        <!-- Quick Actions & User Card -->
+        <div class="p-4 m-4 rounded-2xl bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 border border-purple-100/60 text-center space-y-3 shadow-sm">
+            <div class="w-10 h-10 rounded-full bg-white text-purple-600 flex items-center justify-center mx-auto shadow-sm text-sm font-bold">
+                ✨
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-slate-800">Need a New Habit?</h4>
+                <p class="text-[10px] text-slate-500 mt-0.5">Add to your monthly tracking list instantly.</p>
+            </div>
+            <button onclick="openTaskModal()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-500/20 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus text-xs"></i> New Habit
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar">
+        
+        <!-- Top Sticky Header -->
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-10">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">PWA Workspace</span>
+                    <span class="text-xs text-slate-400" id="header-date-indicator">Nov 2026</span>
+                </div>
+                <h2 class="text-lg font-bold text-slate-900 mt-0.5" id="page-heading">Dashboard Overview</h2>
+            </div>
+
+            <!-- Month Selector Controls -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center bg-slate-100/80 rounded-xl p-1 border border-slate-200/70">
+                    <button onclick="changeMonth(-1)" class="p-2 hover:bg-white rounded-lg text-slate-600 transition shadow-none hover:shadow-sm"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <span id="month-year-label" class="px-4 text-xs font-bold text-slate-700 font-serif">November 2026</span>
+                    <button onclick="changeMonth(1)" class="p-2 hover:bg-white rounded-lg text-slate-600 transition shadow-none hover:shadow-sm"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+                
+                <button onclick="openCategoryModal()" class="px-3.5 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-xl font-bold text-xs hover:bg-emerald-100 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-folder-plus"></i> Category
+                </button>
+                <button onclick="openTaskModal()" class="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold text-xs hover:opacity-95 shadow-md shadow-purple-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Add Habit
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Body Views -->
+        <div class="p-6 space-y-6 flex-1">
+            
+            <!-- VIEW: BEAUTIFUL DASHBOARD OVERVIEW -->
+            <div id="view-dashboard" class="space-y-6">
+                
+                <!-- Vibrant Pastel Welcome Banner -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-200 via-pink-100 to-amber-100 p-8 border border-white/80 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div class="space-y-3 max-w-xl text-left z-10">
+                        <div class="inline-flex items-center gap-2 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-purple-700 border border-white/60">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Productivity Space
+                        </div>
+                        <h3 class="text-3xl font-extrabold text-slate-900 tracking-tight font-serif">Welcome back, Divya! ✨</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed" id="dashboard-quote">
+                            "Small daily habits create extraordinary long-term transformations. Keep ticking off your routine!"
+                        </p>
+                        <div class="flex flex-wrap items-center gap-3 pt-1 text-xs">
+                            <div class="bg-white/80 px-3.5 py-1.5 rounded-xl font-semibold text-slate-700 flex items-center gap-1.5 border border-white">
+                                <i class="fa-solid fa-fire text-amber-500"></i> Streak: <span id="dash-banner-streak" class="text-purple-700 font-bold">5 Days</span>
+                            </div>
+                            <div class="bg-white/80 px-3.5 py-1.5 rounded-xl font-semibold text-slate-700 flex items-center gap-1.5 border border-white">
+                                <i class="fa-solid fa-bullseye text-emerald-500"></i> Monthly Target: <span id="dash-banner-target" class="text-emerald-700 font-bold">85%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Graphic Pill -->
+                    <div class="relative z-10 flex-shrink-0 bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white shadow-lg text-center space-y-2 min-w-[200px]">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Overall Completion</div>
+                        <div class="text-4xl font-extrabold text-purple-700 tracking-tight" id="dash-banner-pct">0%</div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div id="dash-banner-progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-medium">Automatic Real-Time Sync</div>
+                    </div>
+                </div>
+
+                <!-- 5 Modern Pastel Summary Metric Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    
+                    <!-- Metric 1: Total Habits -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-3 transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Tasks</span>
+                            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-slate-800" id="stat-total-tasks">0</div>
+                            <p class="text-[10px] text-purple-600 font-medium mt-0.5">Configured habits</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 2: Completed Checks -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-3 transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600/80">Completed</span>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-emerald-600" id="stat-completed-checks">0</div>
+                            <p class="text-[10px] text-emerald-600 font-medium mt-0.5">Successful checkmarks</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 3: Pending Checks -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-3 transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600/80">Pending</span>
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-amber-500" id="stat-pending-checks">0</div>
+                            <p class="text-[10px] text-amber-600 font-medium mt-0.5">Remaining this month</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 4: Monthly Progress -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-3 transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600/80">Progress</span>
+                            <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-blue-600" id="stat-progress-pct">0%</div>
+                            <p class="text-[10px] text-blue-600 font-medium mt-0.5">Completion rate</p>
+                        </div>
+                    </div>
+
+                    <!-- Metric 5: Consistency Streak -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-3 transition hover:-translate-y-1 col-span-2 md:col-span-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-pink-600/80">Consistency</span>
+                            <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-500 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-fire"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-pink-500 flex items-center gap-1">
+                                <span id="stat-streak">0</span> <span class="text-xs">Days</span>
+                            </div>
+                            <p class="text-[10px] text-pink-500 font-medium mt-0.5">Best: <span id="stat-best-streak">0</span> Days</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Main Habit Grid Snapshot & Category Analytics -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Left Column: Visual Habit Snapshot Grid -->
+                    <div class="lg:col-span-2 glass-card p-6 rounded-3xl space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-base font-serif flex items-center gap-2">
+                                    <i class="fa-solid fa-table-cells text-purple-600"></i> Monthly Habit Snapshot
+                                </h3>
+                                <p class="text-xs text-slate-400">Interactive quick-check habit tracker preview</p>
+                            </div>
+                            <button onclick="switchTab('tracker')" class="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition">
+                                Expand Full Table <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+
+                        <!-- Scrollable Snapshot Table -->
+                        <div class="overflow-x-auto custom-scrollbar border border-slate-100 rounded-2xl bg-white/70">
+                            <table class="w-full text-xs text-left border-collapse" id="dashboard-tracker-preview">
+                                <!-- Dynamically Rendered Grid Snapshot -->
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Category Distribution & Heatmap Quick View -->
+                    <div class="space-y-6">
+                        <!-- Doughnut Category Chart -->
+                        <div class="glass-card p-6 rounded-3xl space-y-4">
+                            <h3 class="font-bold text-slate-800 text-base font-serif flex items-center gap-2">
+                                <i class="fa-solid fa-chart-donut text-pink-500"></i> Category Breakdown
+                            </h3>
+                            <div class="h-52 relative flex items-center justify-center">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                            <div id="category-legend-list" class="space-y-2 pt-2 border-t border-slate-100/80 text-xs">
+                                <!-- Legend items -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: FULL MONTHLY HABIT GRID -->
+            <div id="view-tracker" class="hidden space-y-4">
+                <div class="glass-card p-6 rounded-3xl space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg font-serif">Monthly Habit Tracker Grid</h3>
+                            <p class="text-xs text-slate-400">Tick boxes under specific dates to update daily progress across weeks.</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-medium">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-purple-100 border border-purple-300"></span> Academics</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-pink-100 border border-pink-300"></span> Hobbies</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-300"></span> Health</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-300"></span> Growth</span>
+                        </div>
+                    </div>
+
+                    <!-- Large Grid Container -->
+                    <div class="overflow-x-auto custom-scrollbar border border-slate-200/60 rounded-2xl bg-white shadow-inner">
+                        <table class="w-full text-xs text-left border-collapse" id="tracker-table">
+                            <!-- Populated dynamically -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: DAILY TASKS CHECKLIST -->
+            <div id="view-daily" class="hidden space-y-6">
+                <div class="glass-card p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-100 border border-purple-200 flex flex-col items-center justify-center text-purple-700 shadow-sm">
+                            <span class="text-[10px] font-bold uppercase tracking-wider" id="daily-day-name">TODAY</span>
+                            <span class="text-xl font-extrabold leading-none" id="daily-day-num">7</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg font-serif" id="daily-date-heading">Daily Checklist</h3>
+                            <p class="text-xs text-slate-400">View and mark scheduled daily habits for selected date</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-slate-500">Select Date:</label>
+                        <input type="date" id="daily-date-picker" onchange="loadDailyView(this.value)" class="px-3.5 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 bg-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 glass-card p-6 rounded-3xl space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <h4 class="font-bold text-slate-800 text-sm">Scheduled Tasks</h4>
+                            <span id="daily-completed-badge" class="text-xs bg-purple-100 text-purple-700 font-bold px-3 py-1 rounded-full">0/0 Completed</span>
+                        </div>
+                        <div id="daily-task-list" class="space-y-3">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-3xl space-y-5 text-center">
+                        <h4 class="font-bold text-slate-800 text-sm text-left">Daily Completion Rate</h4>
+                        <div class="py-2">
+                            <div class="inline-flex items-center justify-center w-36 h-36 rounded-full bg-gradient-to-tr from-purple-100 to-pink-100 border-4 border-white shadow-inner text-purple-700 text-3xl font-extrabold" id="daily-progress-circle">
+                                0%
+                            </div>
+                        </div>
+                        <div class="space-y-2.5 text-xs text-left pt-2 border-t border-slate-100">
+                            <div class="flex justify-between text-slate-600 font-medium">
+                                <span>Total Tasks Scheduled:</span>
+                                <span class="font-bold text-slate-800" id="daily-total-count">0</span>
+                            </div>
+                            <div class="flex justify-between text-emerald-600 font-medium">
+                                <span>Completed Tasks:</span>
+                                <span class="font-bold" id="daily-done-count">0</span>
+                            </div>
+                            <div class="flex justify-between text-amber-600 font-medium">
+                                <span>Pending Tasks:</span>
+                                <span class="font-bold" id="daily-rem-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CATEGORIES MANAGEMENT -->
+            <div id="view-categories" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg font-serif">Category & Habit Management</h3>
+                        <p class="text-xs text-slate-400">Organize habits into pastel categories and priorities.</p>
+                    </div>
+                    <button onclick="openCategoryModal()" class="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition">
+                        + New Category
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="categories-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- VIEW: PROGRESS & ANALYTICS -->
+            <div id="view-analytics" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 rounded-3xl space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm font-serif">Daily Progress Trend (%)</h4>
+                        <div class="h-64">
+                            <canvas id="dailyProgressChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 rounded-3xl space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm font-serif">Weekly Consistency Overview</h4>
+                        <div class="h-64">
+                            <canvas id="weeklyBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Heatmap -->
+                <div class="glass-card p-6 rounded-3xl space-y-4">
+                    <h4 class="font-bold text-slate-800 text-sm font-serif">Consistency Calendar Heatmap</h4>
+                    <p class="text-xs text-slate-400">Darker shades represent higher task completion performance per day.</p>
+                    <div id="calendar-heatmap" class="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-15 gap-2.5 pt-2">
+                        <!-- Heatmap cells -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SETTINGS & BACKUP -->
+            <div id="view-settings" class="hidden space-y-6 max-w-2xl">
+                <div class="glass-card p-6 rounded-3xl space-y-5">
+                    <h3 class="font-bold text-slate-800 text-lg font-serif">Settings & Data Management</h3>
+                    <div class="space-y-4 text-xs">
+                        <div class="flex items-center justify-between p-4 bg-white/80 rounded-2xl border border-slate-100">
+                            <div>
+                                <div class="font-bold text-slate-800">Export Monthly Data (CSV)</div>
+                                <div class="text-slate-400 mt-0.5">Download complete spreadsheet log of habit checks.</div>
+                            </div>
+                            <button onclick="exportDataCSV()" class="px-4 py-2 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition">
+                                <i class="fa-solid fa-download mr-1"></i> Export
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-rose-50/70 rounded-2xl border border-rose-100">
+                            <div>
+                                <div class="font-bold text-rose-700">Reset All App Data</div>
+                                <div class="text-rose-400 mt-0.5">Wipe all custom habits and reset to default preset tasks.</div>
+                            </div>
+                            <button onclick="resetPlannerData()" class="px-4 py-2 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition">
+                                <i class="fa-solid fa-trash-can mr-1"></i> Reset Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal: Add / Edit Task -->
+    <div id="taskModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 animate-in fade-in duration-200">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="font-bold text-slate-800 text-base font-serif" id="task-modal-title">Add New Habit</h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="task-form" onsubmit="handleTaskSubmit(event)" class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="task-id">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Habit Title *</label>
+                    <input type="text" id="task-name" required placeholder="e.g., Read for 20 minutes" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Category *</label>
+                    <select id="task-category" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500">
+                        <!-- Options dynamically loaded -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Priority</label>
+                        <select id="task-priority" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Repeat Schedule</label>
+                        <select id="task-repeat" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500">
+                            <option value="Daily">Daily</option>
+                            <option value="Weekdays">Weekdays</option>
+                            <option value="Weekends">Weekends</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeTaskModal()" class="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-semibold hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 shadow-md shadow-purple-500/20">Save Habit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Category -->
+    <div id="categoryModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-100">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="font-bold text-slate-800 text-base font-serif">Add New Category</h3>
+                <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleCategorySubmit(event)" class="p-6 space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Category Title *</label>
+                    <input type="text" id="cat-name" required placeholder="e.g., MINDFULNESS" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Pastel Palette Accent</label>
+                    <select id="cat-color" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500">
+                        <option value="purple">Soft Lavender</option>
+                        <option value="pink">Baby Pink</option>
+                        <option value="emerald">Mint Green</option>
+                        <option value="blue">Light Sky Blue</option>
+                        <option value="amber">Peach Amber</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 font-semibold hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-md shadow-emerald-600/20">Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Core State Management
+        let currentDate = new Date(2026, 10, 7); // Nov 2026 default
+        let categories = [];
+        let tasks = [];
+        let records = {};
+
+        // Aesthetic Palette Color Mappings
+        const colorStyles = {
+            purple: { bg: 'bg-purple-50/60', text: 'text-purple-700', border: 'border-purple-200', tag: 'bg-purple-100', dot: 'bg-purple-500' },
+            pink: { bg: 'bg-pink-50/60', text: 'text-pink-700', border: 'border-pink-200', tag: 'bg-pink-100', dot: 'bg-pink-400' },
+            emerald: { bg: 'bg-emerald-50/60', text: 'text-emerald-700', border: 'border-emerald-200', tag: 'bg-emerald-100', dot: 'bg-emerald-500' },
+            blue: { bg: 'bg-blue-50/60', text: 'text-blue-700', border: 'border-blue-200', tag: 'bg-blue-100', dot: 'bg-blue-500' },
+            amber: { bg: 'bg-amber-50/60', text: 'text-amber-700', border: 'border-amber-200', tag: 'bg-amber-100', dot: 'bg-amber-500' }
+        };
+
+        // Presets for Academic Mini-Project Demo
+        const defaultCategories = [
+            { id: 'cat-1', name: 'ACADEMICS', color: 'purple' },
+            { id: 'cat-2', name: 'HOBBIES', color: 'pink' },
+            { id: 'cat-3', name: 'HEALTH & FITNESS', color: 'emerald' },
+            { id: 'cat-4', name: 'PERSONAL GROWTH', color: 'blue' },
+            { id: 'cat-5', name: 'SKILLS & CAREER', color: 'amber' }
+        ];
+
+        const defaultTasks = [
+            { id: 't1', catId: 'cat-1', name: 'Study for 2 hours', priority: 'High', repeat: 'Daily' },
+            { id: 't2', catId: 'cat-1', name: 'Revise today\'s topics', priority: 'Medium', repeat: 'Daily' },
+            { id: 't3', catId: 'cat-1', name: 'Practice coding LeetCode', priority: 'High', repeat: 'Daily' },
+            { id: 't4', catId: 'cat-2', name: 'Listen to music & sketch', priority: 'Low', repeat: 'Daily' },
+            { id: 't5', catId: 'cat-2', name: 'Learn Japanese phrases', priority: 'Medium', repeat: 'Daily' },
+            { id: 't6', catId: 'cat-3', name: 'Drink enough water', priority: 'High', repeat: 'Daily' },
+            { id: 't7', catId: 'cat-3', name: 'Exercise 30 mins', priority: 'Medium', repeat: 'Daily' },
+            { id: 't8', catId: 'cat-4', name: 'Practice English speaking', priority: 'Medium', repeat: 'Daily' },
+            { id: 't9', catId: 'cat-5', name: 'Learn Web Development', priority: 'High', repeat: 'Daily' }
+        ];
+
+        // Initialization
+        window.onload = function() {
+            loadStorage();
+            initCharts();
+            renderAll();
+        };
+
+        function loadStorage() {
+            const savedCat = localStorage.getItem('planner_categories');
+            const savedTasks = localStorage.getItem('planner_tasks');
+            const savedRec = localStorage.getItem('planner_records');
+
+            categories = savedCat ? JSON.parse(savedCat) : defaultCategories;
+            tasks = savedTasks ? JSON.parse(savedTasks) : defaultTasks;
+            records = savedRec ? JSON.parse(savedRec) : {};
+
+            // Seed demo completion records if empty
+            if (Object.keys(records).length === 0) {
+                for (let d = 1; d <= 7; d++) {
+                    const dateStr = `2026-11-${String(d).padStart(2, '0')}`;
+                    tasks.forEach((t, idx) => {
+                        if ((d + idx) % 2 === 0 || d <= 4) {
+                            records[`${dateStr}_${t.id}`] = true;
+                        }
+                    });
+                }
+                saveStorage();
+            }
+        }
+
+        function saveStorage() {
+            localStorage.setItem('planner_categories', JSON.stringify(categories));
+            localStorage.setItem('planner_tasks', JSON.stringify(tasks));
+            localStorage.setItem('planner_records', JSON.stringify(records));
+        }
+
+        // Global Render Trigger
+        function renderAll() {
+            updateHeader();
+            renderStats();
+            renderTrackerGrid('tracker-table');
+            renderTrackerGrid('dashboard-tracker-preview');
+            renderCategoriesView();
+            loadDailyView(getFormattedDate(currentDate));
+            updateCharts();
+            renderHeatmap();
+        }
+
+        function updateHeader() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const monthStr = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            document.getElementById('month-year-label').innerText = monthStr;
+            document.getElementById('header-date-indicator').innerText = monthStr;
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderAll();
+        }
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getFormattedDate(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // Monthly Grid Renderer
+        function renderTrackerGrid(elementId) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysCount = getDaysInMonth(year, month);
+
+            let html = `<thead class="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-200"><tr>`;
+            html += `<th class="p-3.5 sticky left-0 bg-slate-50 min-w-[210px] border-r border-slate-200 z-10 font-bold">Category & Habit</th>`;
+
+            for (let d = 1; d <= daysCount; d++) {
+                const dateObj = new Date(year, month, d);
+                const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'narrow' });
+                const isToday = d === 7 && month === 10 && year === 2026;
+                html += `<th class="p-2 text-center min-w-[34px] border-r border-slate-100 ${isToday ? 'bg-purple-100 text-purple-700 font-extrabold' : ''}">
+                            <div class="text-[10px] opacity-60">${dayName}</div>
+                            <div class="text-xs font-bold">${d}</div>
+                         </th>`;
+            }
+            html += `</tr></thead><tbody>`;
+
+            categories.forEach(cat => {
+                const catTasks = tasks.filter(t => t.catId === cat.id);
+                if (catTasks.length === 0) return;
+
+                const style = colorStyles[cat.color] || colorStyles.purple;
+                html += `<tr class="${style.bg} font-bold text-slate-700 border-b border-slate-200/80">
+                            <td colspan="${daysCount + 1}" class="p-2.5 px-4 text-xs tracking-wider flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${style.dot}"></span> ${cat.name}
+                            </td>
+                         </tr>`;
+
+                catTasks.forEach(task => {
+                    html += `<tr class="border-b border-slate-100/80 hover:bg-slate-50/80 transition">`;
+                    html += `<td class="p-2.5 px-4 font-medium text-slate-700 sticky left-0 bg-white border-r border-slate-200 flex items-center justify-between group z-10 shadow-sm">
+                                <span class="truncate max-w-[170px] font-semibold text-xs">${task.name}</span>
+                                <div class="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 transition">
+                                    <button onclick="editTask('${task.id}')" class="text-slate-400 hover:text-purple-600 text-xs"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                             </td>`;
+
+                    for (let d = 1; d <= daysCount; d++) {
+                        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                        const recKey = `${dateStr}_${task.id}`;
+                        const isChecked = !!records[recKey];
+
+                        html += `<td class="p-1 text-center border-r border-slate-100">
+                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRecord('${dateStr}', '${task.id}')" class="checkbox-habit">
+                                 </td>`;
+                    }
+                    html += `</tr>`;
+                });
+            });
+
+            html += `</tbody>`;
+            container.innerHTML = html;
+        }
+
+        function toggleRecord(dateStr, taskId) {
+            const recKey = `${dateStr}_${taskId}`;
+            records[recKey] = !records[recKey];
+            saveStorage();
+            renderAll();
+        }
+
+        // Stats Calculation
+        function renderStats() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysCount = getDaysInMonth(year, month);
+            const totalPossible = tasks.length * daysCount;
+
+            let completedCount = 0;
+            for (let d = 1; d <= daysCount; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                tasks.forEach(t => {
+                    if (records[`${dateStr}_${t.id}`]) completedCount++;
+                });
+            }
+
+            const pct = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+
+            document.getElementById('stat-total-tasks').innerText = tasks.length;
+            document.getElementById('stat-completed-checks').innerText = completedCount;
+            document.getElementById('stat-pending-checks').innerText = Math.max(0, totalPossible - completedCount);
+            document.getElementById('stat-progress-pct').innerText = `${pct}%`;
+            
+            document.getElementById('dash-banner-pct').innerText = `${pct}%`;
+            document.getElementById('dash-banner-progress-bar').style.width = `${pct}%`;
+
+            // Streak calculation
+            let streak = 0;
+            for (let d = 7; d >= 1; d--) {
+                const dateStr = `2026-11-${String(d).padStart(2, '0')}`;
+                const anyDone = tasks.some(t => records[`${dateStr}_${t.id}`]);
+                if (anyDone) streak++;
+                else break;
+            }
+            document.getElementById('stat-streak').innerText = streak;
+            document.getElementById('stat-best-streak').innerText = Math.max(streak, 6);
+            document.getElementById('dash-banner-streak').innerText = `${streak} Days`;
+        }
+
+        // Daily Tasks View
+        function loadDailyView(dateStr) {
+            document.getElementById('daily-date-picker').value = dateStr;
+            const dateObj = new Date(dateStr);
+            document.getElementById('daily-day-num').innerText = dateObj.getDate() || 7;
+            document.getElementById('daily-date-heading').innerText = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+            const container = document.getElementById('daily-task-list');
+            let completed = 0;
+
+            let html = '';
+            tasks.forEach(task => {
+                const cat = categories.find(c => c.id === task.catId) || categories[0];
+                const recKey = `${dateStr}_${task.id}`;
+                const isChecked = !!records[recKey];
+                if (isChecked) completed++;
+
+                const style = colorStyles[cat.color] || colorStyles.purple;
+
+                html += `<div class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 bg-white shadow-sm hover:border-purple-200 transition">
+                            <div class="flex items-center gap-3.5">
+                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRecord('${dateStr}', '${task.id}')" class="checkbox-habit">
+                                <div>
+                                    <div class="font-bold text-slate-800 text-xs ${isChecked ? 'line-through text-slate-400' : ''}">${task.name}</div>
+                                    <span class="text-[9px] ${style.tag} ${style.text} px-2.5 py-0.5 rounded-full font-bold tracking-wide uppercase mt-1 inline-block">${cat.name}</span>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg">${task.priority}</span>
+                         </div>`;
+            });
+
+            container.innerHTML = html || '<div class="text-xs text-slate-400 py-6 text-center">No tasks available for this day.</div>';
+
+            const total = tasks.length;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('daily-completed-badge').innerText = `${completed}/${total} Completed`;
+            document.getElementById('daily-progress-circle').innerText = `${pct}%`;
+            document.getElementById('daily-total-count').innerText = total;
+            document.getElementById('daily-done-count').innerText = completed;
+            document.getElementById('daily-rem-count').innerText = Math.max(0, total - completed);
+        }
+
+        // Category Cards View
+        function renderCategoriesView() {
+            const grid = document.getElementById('categories-grid');
+            let html = '';
+
+            categories.forEach(cat => {
+                const catTasks = tasks.filter(t => t.catId === cat.id);
+                const style = colorStyles[cat.color] || colorStyles.purple;
+
+                html += `<div class="glass-card p-6 rounded-3xl space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                <span class="font-bold text-xs ${style.tag} ${style.text} px-3 py-1 rounded-full uppercase tracking-wider">${cat.name}</span>
+                                <button onclick="deleteCategory('${cat.id}')" class="text-slate-300 hover:text-rose-500 text-xs transition"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                            <div class="space-y-2 text-xs">`;
+                
+                catTasks.forEach(t => {
+                    html += `<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50/80 font-medium">
+                                <span class="text-slate-700">${t.name}</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">${t.priority}</span>
+                             </div>`;
+                });
+
+                html += `   </div>
+                            <button onclick="openTaskModal('${cat.id}')" class="w-full py-2.5 bg-white text-purple-700 rounded-xl text-xs font-bold hover:bg-purple-50 border border-purple-100 transition shadow-sm">
+                                + Add Habit to ${cat.name}
+                            </button>
+                         </div>`;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // Analytics Charts
+        let catChart, progressChart, weeklyChart;
+
+        function initCharts() {
+            const ctx1 = document.getElementById('categoryChart').getContext('2d');
+            catChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: categories.map(c => c.name),
+                    datasets: [{
+                        data: [3, 2, 2, 1, 1],
+                        backgroundColor: ['#7E57C2', '#FDE2E4', '#D8F3DC', '#E2ECE9', '#FFE5D9'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '70%'
+                }
+            });
+
+            const ctx2 = document.getElementById('dailyProgressChart').getContext('2d');
+            progressChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 30}, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'Completion Rate %',
+                        data: [65, 70, 80, 75, 85, 90, 88, 70, 75, 82, 85, 90, 92, 88, 80, 85, 87, 90, 95, 92, 88, 85, 80, 84, 88, 90, 92, 85, 89, 94],
+                        borderColor: '#7E57C2',
+                        backgroundColor: 'rgba(126, 87, 194, 0.08)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctx3 = document.getElementById('weeklyBarChart').getContext('2d');
+            weeklyChart = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                    datasets: [{
+                        label: 'Weekly Completion %',
+                        data: [82, 88, 76, 92, 85],
+                        backgroundColor: ['#E9E4F0', '#FDE2E4', '#D8F3DC', '#E2ECE9', '#FFE5D9'],
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function updateCharts() {
+            if (!catChart) return;
+            catChart.data.labels = categories.map(c => c.name);
+            catChart.data.datasets[0].data = categories.map(c => tasks.filter(t => t.catId === c.id).length);
+            catChart.update();
+
+            // Populate custom category legend
+            const legend = document.getElementById('category-legend-list');
+            if (legend) {
+                legend.innerHTML = categories.map(c => {
+                    const style = colorStyles[c.color] || colorStyles.purple;
+                    const count = tasks.filter(t => t.catId === c.id).length;
+                    return `<div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full ${style.dot}"></span>
+                                    <span class="font-bold text-slate-700">${c.name}</span>
+                                </div>
+                                <span class="font-bold text-slate-400">${count} Habits</span>
+                            </div>`;
+                }).join('');
+            }
+        }
+
+        // Heatmap Matrix
+        function renderHeatmap() {
+            const container = document.getElementById('calendar-heatmap');
+            if (!container) return;
+            let html = '';
+            for (let i = 1; i <= 30; i++) {
+                const opacity = (i % 4 === 0) ? 'bg-purple-600 text-white shadow-sm' : (i % 2 === 0) ? 'bg-purple-300 text-purple-900' : 'bg-purple-100 text-purple-700';
+                html += `<div class="h-9 rounded-xl ${opacity} flex items-center justify-center font-bold text-xs transition hover:scale-105" title="Day ${i}: ${80 + (i%20)}% Completed">${i}</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // Tab Navigation Router
+        function switchTab(tabId) {
+            document.querySelectorAll('#sidebar-nav .nav-link').forEach(el => el.classList.remove('active'));
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const views = ['dashboard', 'tracker', 'daily', 'categories', 'analytics', 'settings'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+            // Set Header Title
+            const titles = {
+                dashboard: 'Dashboard Overview',
+                tracker: 'Monthly Habit Tracker Grid',
+                daily: 'Daily Task View',
+                categories: 'Category & Habit Management',
+                analytics: 'Progress Analytics',
+                settings: 'Settings & Data Management'
+            };
+            document.getElementById('page-heading').innerText = titles[tabId] || 'Dashboard Overview';
+        }
+
+        // Modal Action Dialogs
+        function openTaskModal(catId = null) {
+            const catSelect = document.getElementById('task-category');
+            catSelect.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            if (catId) catSelect.value = catId;
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+        function closeTaskModal() { document.getElementById('taskModal').classList.add('hidden'); }
+
+        function openCategoryModal() { document.getElementById('categoryModal').classList.remove('hidden'); }
+        function closeCategoryModal() { document.getElementById('categoryModal').classList.add('hidden'); }
+
+        function handleTaskSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('task-name').value;
+            const catId = document.getElementById('task-category').value;
+            const priority = document.getElementById('task-priority').value;
+            const repeat = document.getElementById('task-repeat').value;
+
+            tasks.push({ id: 't_' + Date.now(), catId, name, priority, repeat });
+            saveStorage();
+            closeTaskModal();
+            renderAll();
+        }
+
+        function handleCategorySubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('cat-name').value.toUpperCase();
+            const color = document.getElementById('cat-color').value;
+
+            categories.push({ id: 'cat_' + Date.now(), name, color });
+            saveStorage();
+            closeCategoryModal();
+            renderAll();
+        }
+
+        function deleteTask(id) {
+            if (confirm('Are you sure you want to delete this habit?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveStorage();
+                renderAll();
+            }
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Delete category and all associated habits?')) {
+                categories = categories.filter(c => c.id !== id);
+                tasks = tasks.filter(t => t.catId !== id);
+                saveStorage();
+                renderAll();
+            }
+        }
+
+        function exportDataCSV() {
+            let csv = "Date,Habit,Category,Status\n";
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const daysCount = getDaysInMonth(year, month);
+
+            for (let d = 1; d <= daysCount; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                tasks.forEach(t => {
+                    const cat = categories.find(c => c.id === t.catId)?.name || '';
+                    const status = records[`${dateStr}_${t.id}`] ? "Completed" : "Pending";
+                    csv += `"${dateStr}","${t.name}","${cat}","${status}"\n`;
+                });
+            }
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `monthly_habit_tracker_data.csv`);
+            a.click();
+        }
+
+        function resetPlannerData() {
+            if (confirm('Reset all planner data back to defaults?')) {
+                localStorage.clear();
+                categories = defaultCategories;
+                tasks = defaultTasks;
+                records = {};
+                saveStorage();
+                renderAll();
+            }
+        }
+    </script>
+</body>
+</html>
